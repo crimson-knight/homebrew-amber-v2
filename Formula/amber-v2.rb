@@ -2,7 +2,7 @@ class AmberV2 < Formula
   desc "Amber Framework V2 CLI - Web application framework for Crystal"
   homepage "https://amberframework.org"
   license "MIT"
-  head "https://github.com/crimson-knight/amber_cli.git", branch: "main"
+  head "https://github.com/amberframework/amber_cli.git", branch: "main"
 
   # Uncomment and update when a release version is available:
   # url "https://github.com/crimson-knight/amber_cli/archive/refs/tags/v2.0.0.tar.gz"
