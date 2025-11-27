@@ -20,8 +20,8 @@ class AmberV2 < Formula
   conflicts_with "amber", because: "both install an `amber` binary"
 
   def install
-    # Install shards dependencies
-    system "shards", "install", "--production"
+    # Install shards dependencies (no --production since HEAD doesn't include shard.lock)
+    system "shards", "install"
 
     # Build the CLI
     system "shards", "build", "--release", "--no-debug"
