@@ -4,10 +4,11 @@ class AmberV2 < Formula
   license "MIT"
   head "https://github.com/amberframework/amber_cli.git", branch: "main"
 
-  # Uncomment and update when a release version is available:
-  # url "https://github.com/crimson-knight/amber_cli/archive/refs/tags/v2.0.0.tar.gz"
-  # sha256 "UPDATE_WITH_ACTUAL_SHA256_HASH"
-  # version "2.0.0"
+  # Retired: amberframework/amber_cli/amber_cli installs the tagged V2 release tarball,
+  # verified by sha256, and resolves its shards with `minecart install --frozen`.
+  disable! date:                "2026-10-24",
+           because:             "is replaced by the sha256-pinned amber_cli release formula",
+           replacement_formula: "amberframework/amber_cli/amber_cli"
 
   depends_on "crystal"
   depends_on "libpq"
