@@ -17,17 +17,17 @@ Each step runs only when the one before it passed. `amber-v2` stays installed
 ```bash
 brew update
 brew tap amberframework/amber_cli
-brew trust --tap amberframework/amber_cli   # Homebrew 7 asks for this; covers minecart too
-CLI=$(brew cat amberframework/amber_cli/amber_cli) &&
-  MC=$(brew cat amberframework/amber_cli/minecart) &&
-  grep -qx '  sha256 "6e90f3cdba3ed87cefbf7443ab93da627af314fac5960a4b9288ae80e31f591f"' <<<"$CLI" &&
-  grep -qx '  sha256 "15c7c0af5f29dbd5d651fbfe90bfe1c0cd614a5e72a55ccacc2c246c6e1ed38f"' <<<"$MC" &&
+# Both formula files must be the reviewed ones before Homebrew is allowed to load them.
+TAP="$(brew --repository amberframework/amber_cli)/Formula" &&
+  shasum -a 256 "$TAP/amber_cli.rb" | grep -q "^e127275857579f8d2b5462fc15b76097fdf05d7a9ef940c378ba3a32def6dd08 " &&
+  shasum -a 256 "$TAP/minecart.rb" | grep -q "^ee4a9a4ce105ef2bbd8a0b7a3503285dee5b0033dd3a46a729dbaa66b3ab9c37 " &&
+  brew trust --tap amberframework/amber_cli &&
   HOMEBREW_NO_AUTO_UPDATE=1 brew fetch --build-from-source \
     amberframework/amber_cli/amber_cli amberframework/amber_cli/minecart &&
   brew unlink amber-v2 &&
   { ! brew list --formula shards-alpha >/dev/null 2>&1 || HOMEBREW_NO_AUTOREMOVE=1 brew uninstall shards-alpha; } &&
   { ! brew list --formula amber >/dev/null 2>&1 || HOMEBREW_NO_AUTOREMOVE=1 brew uninstall amber; } &&
-  HOMEBREW_NO_AUTO_UPDATE=1 brew install amberframework/amber_cli/amber_cli &&
+  HOMEBREW_NO_AUTO_UPDATE=1 brew install --build-from-source amberframework/amber_cli/amber_cli &&
   amber --version | grep -q "2\.0\.7" &&
   minecart --version &&
   HOMEBREW_NO_AUTOREMOVE=1 brew uninstall amber-v2
@@ -38,12 +38,14 @@ CLI=$(brew cat amberframework/amber_cli/amber_cli) &&
 Remove whatever part of the replacement was installed, then relink the old CLI:
 
 ```bash
-HOMEBREW_NO_AUTOREMOVE=1 brew uninstall --ignore-dependencies amberframework/amber_cli/amber_cli 2>/dev/null
-HOMEBREW_NO_AUTOREMOVE=1 brew uninstall --ignore-dependencies amberframework/amber_cli/minecart 2>/dev/null
-brew link amber-v2
-amber --version
-# Only if the block above removed shards-alpha:
-HOMEBREW_NO_AUTO_UPDATE=1 brew install crimson-knight/tap/shards-alpha
+{ ! brew list --formula amber_cli >/dev/null 2>&1 ||
+    HOMEBREW_NO_AUTOREMOVE=1 brew uninstall --ignore-dependencies amber_cli; } &&
+  { ! brew list --formula minecart >/dev/null 2>&1 ||
+    HOMEBREW_NO_AUTOREMOVE=1 brew uninstall --ignore-dependencies minecart; } &&
+  brew link amber-v2 &&
+  amber --version
+# Then, only if the migration removed shards-alpha:
+HOMEBREW_NO_AUTO_UPDATE=1 brew install crimson-knight/tap/shards-alpha && shards-alpha --version
 ```
 
 `brew install crimson-knight/amber-v2/amber-v2` now stops with a message that
