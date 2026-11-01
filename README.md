@@ -17,16 +17,18 @@ the Amber CLI tap at commit `add328ed517dfffc6b0b07293b85fe25ae140bdc`, where
 
 1. `brew unlink crimson-knight/amber-v2/amber-v2`, so the replacement can link its
    own `amber`. Keep the `amber-v2` keg installed for now.
-2. Tap and check the reviewed formulas, then install:
+2. Tap, pin and verify the reviewed formulas, then install. Paste the block as one
+   command: each step runs only if the one before it succeeded, so a hash mismatch
+   stops it before `brew install`.
    ```sh
-   brew tap amberframework/amber_cli
-   git -C "$(brew --repo amberframework/amber_cli)" checkout --detach add328ed517dfffc6b0b07293b85fe25ae140bdc
-   shasum -a 256 "$(brew --repo amberframework/amber_cli)"/Formula/amber_cli.rb "$(brew --repo amberframework/amber_cli)"/Formula/minecart.rb
+   T="$(brew tap amberframework/amber_cli >/dev/null && brew --repo amberframework/amber_cli)" &&
+   git -C "$T" checkout --detach add328ed517dfffc6b0b07293b85fe25ae140bdc &&
+   printf "%s  %s\n" e127275857579f8d2b5462fc15b76097fdf05d7a9ef940c378ba3a32def6dd08 "$T/Formula/amber_cli.rb" ee4a9a4ce105ef2bbd8a0b7a3503285dee5b0033dd3a46a729dbaa66b3ab9c37 "$T/Formula/minecart.rb" | shasum -a 256 -c - &&
    HOMEBREW_NO_AUTO_UPDATE=1 brew install amberframework/amber_cli/amber_cli
    ```
-   Install only when both `shasum` lines print the hashes above. Homebrew names any
-   other installed formula that conflicts with it (`shards-alpha`, legacy `amber`);
-   unlink that formula the same way and run the install again.
+   Homebrew names any other installed formula that conflicts with it
+   (`shards-alpha`, legacy `amber`); unlink that formula the same way and run the
+   block again.
 3. Check the replacement: `type -a amber` lists the `amber_cli` keg path first,
    `amber --version` prints `Amber CLI v2.0.7`, and `minecart --version` prints
    `Minecart 2025.11.25.8 (2026-10-06)`.
